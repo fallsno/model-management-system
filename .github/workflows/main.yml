@@ -6,17 +6,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      
+      - name: Print working directory structure (debug)
+        run: |
+          pwd
+          ls -la
+      
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      
       - name: Install dependencies
         run: npm install
         working-directory: frontend
+      
       - name: Build
         run: npm run build
-      - name: Verify directory
-        run: ls -la model-management-system/frontend
         working-directory: frontend
+      
       - uses: actions/upload-artifact@v4
         with:
           name: dist
