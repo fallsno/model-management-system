@@ -1,0 +1,33 @@
+﻿version: '3.8'
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: model-db
+    environment:
+      POSTGRES_DB: model_db
+      POSTGRES_USER: model_user
+      POSTGRES_PASSWORD: model_pass
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  backend:
+    build: ./backend
+    container_name: model-backend
+    environment:
+      DATABASE_URL: postgresql://model_user:model_pass@postgres:5432/model_db
+    volumes:
+      - ./backend/uploads:/app/uploads
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: model-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
