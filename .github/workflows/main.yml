@@ -1,16 +1,14 @@
 name: Build Frontend
 on:
-  workflow_dispatch:  # 允许手动触发
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
-      - name: Print working directory structure (debug)
-        run: |
-          pwd
-          ls -la
+      - name: Show repository root structure
+        run: ls -la
       
       - uses: actions/setup-node@v4
         with:
@@ -18,13 +16,13 @@ jobs:
       
       - name: Install dependencies
         run: npm install
-        working-directory: frontend
+        working-directory: model-management-system/frontend
       
       - name: Build
         run: npm run build
-        working-directory: frontend
+        working-directory: model-management-system/frontend
       
       - uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: frontend/dist
+          path: model-management-system/frontend/dist
