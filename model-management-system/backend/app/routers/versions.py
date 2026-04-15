@@ -82,3 +82,7 @@ def delete_file(att_id: int, db: Session = Depends(get_db)):
     db.delete(att)
     db.commit()
     return {"ok": True}
+
+@router.get("/{version_id}/attachments", response_model=List[AttachmentOut])
+def list_attachments(version_id: int, db: Session = Depends(get_db)):
+    return db.query(VersionAttachment).filter(VersionAttachment.version_id == version_id).all()
