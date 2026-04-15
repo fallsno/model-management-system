@@ -1,12 +1,12 @@
-﻿import { createApp } from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+import axios from 'axios'                     // ← 必须导入
 
-// ===== 新增这一行 =====
-axios.defaults.baseURL = 'http://10.30.10.64:8000'
+axios.defaults.baseURL = 'http://10.30.10.64:8000'   // ← 配置基础地址
 
 const app = createApp(App)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
