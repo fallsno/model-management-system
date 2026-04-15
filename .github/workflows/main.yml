@@ -1,28 +1,38 @@
 name: Build Frontend
 on:
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Show repository root structure
-        run: ls -la
-      
-      - uses: actions/setup-node@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 20
-      
+
+      - name: Verify directory structure
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Files in root:"
+          ls -la
+          echo "Files in frontend (if exists):"
+          ls -la frontend || echo "frontend folder not found"
+
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
         working-directory: model-management-system/frontend
-      
+
       - name: Build
         run: npm run build
         working-directory: model-management-system/frontend
-      
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: model-management-system/frontend/dist
