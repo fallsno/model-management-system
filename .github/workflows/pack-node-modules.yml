@@ -1,16 +1,16 @@
-name: Pack Node Modules for Windows
+name: Pack Frontend for Windows (Offline Dev)
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:   # 手动触发，无需推送代码
 
 jobs:
   pack:
     runs-on: windows-latest
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # 消除 Node 20 警告
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -19,14 +19,14 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        working-directory: ./frontend   # 关键：指定工作目录
+        working-directory: frontend   # ✅ 关键修正：直接写 frontend，不要 ./
         run: npm install
 
-      - name: Remove .git folder (from root, optional)
+      - name: Remove .git folder from root (optional, reduces artifact size)
         run: if (Test-Path .git) { Remove-Item .git -Recurse -Force }
 
-      - name: Upload entire frontend folder as artifact
+      - name: Upload frontend folder as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-with-node-modules
-          path: ./frontend   # 只上传 frontend 目录，避免包含 backend 等无关文件
+          name: frontend-offline-dev
+          path: frontend   # 只打包前端目录，解压后直接可用
