@@ -1,13 +1,13 @@
 name: Pack Frontend for Windows (Offline Dev)
 
 on:
-  workflow_dispatch:   # 手动触发，无需推送代码
+  workflow_dispatch:
 
 jobs:
   pack:
     runs-on: windows-latest
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # 消除 Node 20 警告
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout repository
@@ -18,15 +18,28 @@ jobs:
         with:
           node-version: 18
 
+      - name: Find frontend directory (locate package.json)
+        id: find_frontend
+        shell: pwsh
+        run: |
+          $frontendDir = Get-ChildItem -Recurse -Filter "package.json" | Where-Object { $_.FullName -notmatch "node_modules" } | Select-Object -First 1
+          if (-not $frontendDir) {
+            Write-Error "No package.json found in repository"
+            exit 1
+          }
+          $frontendPath = $frontendDir.DirectoryName
+          Write-Output "Frontend directory: $frontendPath"
+          echo "FRONTEND_DIR=$frontendPath" >> $env:GITHUB_ENV
+
       - name: Install dependencies
-        working-directory: frontend   # ✅ 关键修正：直接写 frontend，不要 ./
+        working-directory: ${{ env.FRONTEND_DIR }}
         run: npm install
 
-      - name: Remove .git folder from root (optional, reduces artifact size)
+      - name: Remove .git folder (reduce artifact size)
         run: if (Test-Path .git) { Remove-Item .git -Recurse -Force }
 
       - name: Upload frontend folder as artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend-offline-dev
-          path: frontend   # 只打包前端目录，解压后直接可用
+          path: ${{ env.FRONTEND_DIR }}
