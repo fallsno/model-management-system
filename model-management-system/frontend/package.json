@@ -13,6 +13,7 @@
     "axios": "^1.6.2",
     "element-plus": "^2.4.2",
     "@element-plus/icons-vue": "^2.1.0"
+    "pinia": "^2.1.7"                    
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.0",
