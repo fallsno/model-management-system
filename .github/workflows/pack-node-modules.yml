@@ -34,6 +34,9 @@ jobs:
       - name: Install dependencies
         working-directory: ${{ env.FRONTEND_DIR }}
         run: npm install
+      - name: Update dependencies to latest compatible versions
+        working-directory: ${{ env.FRONTEND_DIR }}
+        run: npm update
 
       - name: Remove .git folder (reduce artifact size)
         run: if (Test-Path .git) { Remove-Item .git -Recurse -Force }
