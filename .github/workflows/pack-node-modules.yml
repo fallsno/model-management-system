@@ -2,12 +2,12 @@ name: Pack Node Modules for Windows
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ main ]
 
 jobs:
   pack:
     runs-on: windows-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Checkout code
@@ -19,15 +19,13 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install   # 改为 install，自动生成 lock 文件
 
-      - name: Pack entire project (using tar)
-        run: |
-          # 使用 tar 打包当前目录，排除 .git 和压缩包自身
-          tar -czf frontend-full.tar.gz --exclude=.git --exclude=frontend-full.tar.gz .
+      - name: Remove .git folder
+        run: if (Test-Path .git) { Remove-Item .git -Recurse -Force }
 
-      - name: Upload artifact
+      - name: Upload entire project as artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend-with-node-modules
-          path: frontend-full.tar.gz
+          path: .
