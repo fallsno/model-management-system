@@ -19,13 +19,14 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install   # 改为 install，自动生成 lock 文件
+        working-directory: ./frontend   # 关键：指定工作目录
+        run: npm install
 
-      - name: Remove .git folder
+      - name: Remove .git folder (from root, optional)
         run: if (Test-Path .git) { Remove-Item .git -Recurse -Force }
 
-      - name: Upload entire project as artifact
+      - name: Upload entire frontend folder as artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend-with-node-modules
-          path: .
+          path: ./frontend   # 只上传 frontend 目录，避免包含 backend 等无关文件
