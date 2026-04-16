@@ -3,28 +3,31 @@ name: Pack Node Modules for Windows
 on:
   workflow_dispatch:   # 手动触发
   push:
-    branches: [ main ] # 可选：每次推送自动生成
+    branches: [ main ] # 可选：自动触发
 
 jobs:
   pack:
-    runs-on: windows-latest   # 关键：使用 Windows 环境
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4   # 升级至 v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 # 升级至 v4
         with:
           node-version: 18
 
       - name: Install dependencies
-        run: npm ci   # 或 npm install
+        run: npm ci   # 使用 ci 更快且严格按 lock 文件安装
 
       - name: Pack entire project
+        shell: pwsh
         run: |
-          # 排除 .git 和不必要的文件以减小体积
-          Compress-Archive -Path * -DestinationPath frontend-full.zip -Force
+          $tempDir = Join-Path $env:RUNNER_TEMP "frontend-package"
+          New-Item -ItemType Directory -Path $tempDir -Force | Out-Null
+          Copy-Item -Path .\* -Destination $tempDir -Recurse -Force -Exclude @(".git", "frontend-full.zip")
+          Compress-Archive -Path $tempDir\* -DestinationPath frontend-full.zip -Force
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
